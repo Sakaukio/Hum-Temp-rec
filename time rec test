@@ -1,0 +1,78 @@
+#include <DS1302.h>
+DS1302 rtc(8, 7, 6);
+Time t;
+//////////////////////////////////
+int realminSD=0; int realmin;int Start;int SecREC=60;int timecounthour=0;int sumtime;int starttime=30;int bts=10;int buttonState;
+
+void setup() 
+{
+Serial.begin(9600);
+  // Set the clock to run-mode, and disable the write protection
+  rtc.halt(false);
+  rtc.writeProtect(false);
+  pinMode(bts, INPUT);
+
+}
+
+void loop()
+{
+  t = rtc.getTime();
+  realmin = t.sec;
+       if(realmin<=60)
+        {
+          sumtime = realmin + SecREC;
+          if(sumtime>60){sumtime = sumtime-60;}  
+          if(sumtime==60){sumtime = sumtime-59;}
+        } 
+  Serial.print("Setup min/REC: ");
+  Serial.print(SecREC);
+  Serial.print(" Real: ");
+  Serial.print(realmin);
+  Serial.print(" Sum: ");
+  Serial.println(sumtime);
+
+  delay(1000);
+  buttonState = digitalRead(bts);
+  if(buttonState==HIGH)
+  {
+  Start = sumtime;
+  Serial.println("Save Now!!");
+  delay(200);
+  REC();
+  
+  }
+}
+void REC()
+{ 
+  int i=0;
+  while(i==0){
+  t = rtc.getTime();
+  realmin = t.sec;
+  realminSD=1;
+       if(realmin<=60)
+        {
+          sumtime = realmin + SecREC;
+          if(sumtime==60){sumtime = 0;}
+          if(sumtime>60){sumtime = sumtime-60;}  
+        } 
+  Serial.print("Setup min/REC: ");
+  Serial.print(SecREC);
+  Serial.print(" Starttime: ");
+  Serial.print(Start);
+  Serial.print(" Real: ");
+  Serial.print(realmin);
+  Serial.print(" Sum: ");
+  Serial.println(sumtime);
+  delay(1000);
+        if(Start==realmin)
+        {
+         Serial.println("Save Now!!");
+         Start=sumtime;
+        }
+
+  
+  }
+
+}
+    
+  
