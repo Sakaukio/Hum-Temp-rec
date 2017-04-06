@@ -5,7 +5,7 @@ AM2320 th;
 //////////////////SD Card///////////////////
 #include <SD.h>
 File myFile;
-const int chipSelect=10;
+const int chipSelect=53;
 int p=0;
 long int data1=0;
 long int data2=0;
@@ -27,9 +27,9 @@ int THour=0;
 int realminSD=0; //เก็บค่าเวลาเริ่ม Start
 int realmin;
 int Start;
-int SecREC=15;
+int SecREC;
 int sumtime;
-int starttime=30;
+int starttime;
 int bts=5;
 int button;
 
@@ -55,7 +55,7 @@ byte deGree[] = {
 };
 
 //ประกาศตัวแปร
-int Setup = 0 ;
+int Setup = 2 ;
 
 void setup() {
 lcd.begin();
@@ -85,10 +85,12 @@ rtc.writeProtect(false);
     myFile.close();
     
   }
- checkSD();
-}
+ }
 void loop(){
- 
+  while(Setup==2)
+  {
+    checkSD();
+  }
   while(Setup==0)
    {   
      t = rtc.getTime();
@@ -132,71 +134,10 @@ while(Setup==1)
     }    
 }
 
-/*void sensor()
-{
-//อ่านค่า AM2320 และเวลา ส่งออกแสดงบนจอ LCD
-for (int i = 0; i <= 5; i++){
-   switch(th.Read()){
-     case 2:
-       lcd.clear();
-       delay (200);
-       lcd.setCursor(4 ,0);
-       lcd.print("CRC Filed");
-       break;
-     case 1:
-       lcd.clear();
-       delay (200);
-       lcd.setCursor(1,0);
-       lcd.print("Sensor Offline");
-       lcd.setCursor(5,1);
-       lcd.print("!!!!!!");
-       delay (500);
-       break;
-     case 0:
-       lcd.setCursor(0,0);
-       lcd.print("H:");
-       lcd.print(th.h);
-       lcd.setCursor(6,0);
-       lcd.print("%");
-       lcd.setCursor(7,0);
-       lcd.print(" T:");
-       lcd.setCursor(10,0);
-       lcd.print(th.t);
-       lcd.setCursor(14,0);
-       lcd.write(0);
-       lcd.print("C");
-       lcd.setCursor(0,1);
-       lcd.print(" Time: ");
-       lcd.print(rtc.getTimeStr());
-       delay (100);
-       break;  
-       }     
-
-    }
-}*/
-
-/*void datenow()
-//แสดงเวลาวันที่
-{
-for (int i = 0; i <= 5; i++){
-       lcd.setCursor(1,0);
-       lcd.print(rtc.getDOWStr());
-       lcd.setCursor(5,0);
-       lcd.print(rtc.getDateStr());
-       lcd.setCursor(1,1);
-       lcd.print("Time:");
-       lcd.setCursor(7,1);
-       lcd.print(rtc.getTimeStr());
-       delay (1000);                     
-       }
-       lcd.clear();
-       delay (200);
-}*/
 
 void Progarm()
 //Setup Mode
 {
-//Setup--;//ให้ตัวแปร Setup = 0
 THour=0;
 int proOut=0;
   while(proOut==0)
@@ -332,24 +273,35 @@ void REC()
 
 
 void checkSD()//Check SD Card
-{
-  for (int s = 0; s <= 2; s++)
-     {
+{    
      lcd.clear();
      delay(200);
-        if (!SD.begin(chipSelect)) 
-        {
-          // don't do anything more:
+     lcd.setCursor(1,0);
+     lcd.print("Check SD Card!");
+     delay(1000);     
+              if (!SD.begin(chipSelect)) 
+              {
+                // don't do anything more:
+                 lcd.clear();
+                 delay(200);
+                 lcd.setCursor(0,0);
+                 lcd.print("!SD Card Failed!");
+                 lcd.setCursor(0,1);
+                 lcd.print("!!!!!!!!!!!!!!!!");
+                Serial.println("Check SD Card Failed!!!!");
+                delay(1000);
+                Setup=2;
+                return;
+              }
+           lcd.clear();
+           delay(200);
            lcd.setCursor(3,0);
            lcd.print("SD Card OK");
-          Serial.println("Check SD Card OK!!!!");
-          
-        }
-     delay(500);
-     }
-     lcd.clear();
-     delay(200);
-     return;
+           Serial.println("Check SD Card OK!!!!");
+           delay(1000);
+           Setup=0;   
+           lcd.clear();
+           delay(200);
 }
 
 void writeSD()// เขียนค่าลง SD การ์ด
