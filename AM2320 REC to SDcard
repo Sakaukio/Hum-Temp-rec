@@ -132,66 +132,6 @@ while(Setup==1)
     }    
 }
 
-/*void sensor()
-{
-//อ่านค่า AM2320 และเวลา ส่งออกแสดงบนจอ LCD
-for (int i = 0; i <= 5; i++){
-   switch(th.Read()){
-     case 2:
-       lcd.clear();
-       delay (200);
-       lcd.setCursor(4 ,0);
-       lcd.print("CRC Filed");
-       break;
-     case 1:
-       lcd.clear();
-       delay (200);
-       lcd.setCursor(1,0);
-       lcd.print("Sensor Offline");
-       lcd.setCursor(5,1);
-       lcd.print("!!!!!!");
-       delay (500);
-       break;
-     case 0:
-       lcd.setCursor(0,0);
-       lcd.print("H:");
-       lcd.print(th.h);
-       lcd.setCursor(6,0);
-       lcd.print("%");
-       lcd.setCursor(7,0);
-       lcd.print(" T:");
-       lcd.setCursor(10,0);
-       lcd.print(th.t);
-       lcd.setCursor(14,0);
-       lcd.write(0);
-       lcd.print("C");
-       lcd.setCursor(0,1);
-       lcd.print(" Time: ");
-       lcd.print(rtc.getTimeStr());
-       delay (100);
-       break;  
-       }     
-
-    }
-}*/
-
-/*void datenow()
-//แสดงเวลาวันที่
-{
-for (int i = 0; i <= 5; i++){
-       lcd.setCursor(1,0);
-       lcd.print(rtc.getDOWStr());
-       lcd.setCursor(5,0);
-       lcd.print(rtc.getDateStr());
-       lcd.setCursor(1,1);
-       lcd.print("Time:");
-       lcd.setCursor(7,1);
-       lcd.print(rtc.getTimeStr());
-       delay (1000);                     
-       }
-       lcd.clear();
-       delay (200);
-}*/
 
 void Progarm()
 //Setup Mode
