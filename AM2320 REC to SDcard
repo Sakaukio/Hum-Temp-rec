@@ -7,9 +7,6 @@ AM2320 th;
 File myFile;
 const int chipSelect=53;
 int p=0;
-long int data1=0;
-long int data2=0;
-long int data3=0;
 // Setup REC //////////////////////////
 int buttonUp=5;
 int buttonDown=11;
@@ -55,7 +52,7 @@ byte deGree[] = {
 };
 
 //ประกาศตัวแปร
-int Setup = 2 ;
+int Setup = 5 ;
 
 void setup() {
 lcd.begin();
@@ -70,29 +67,18 @@ lcd.createChar(0, deGree);
 rtc.halt(false);
 rtc.writeProtect(false);
 // Write label Excel
-  myFile = SD.open("datalog.csv", FILE_WRITE);
-  if(myFile)
-  {
-    myFile.print("Item");
-    myFile.print(",");
-    myFile.print("Time");
-    myFile.print(",");
-    myFile.print("Date");
-    myFile.print(",");
-    myFile.println("Humidity");
-    myFile.print(",");
-    myFile.println("Temperature ");
-    myFile.close();
-    
-  }
+     Setup = 2;
  }
 void loop(){
+  
   while(Setup==2)
   {
     checkSD();
   }
+    
   while(Setup==0)
-   {   
+   { 
+     th.Read();
      t = rtc.getTime();
      realmin = t.sec;
        if(realmin<=60)
@@ -105,7 +91,7 @@ void loop(){
        th.Read();
        lcd.setCursor(0,0);
        lcd.print("H:");
-       lcd.print(th.h);
+       lcd.print(th.h+10);
        lcd.setCursor(6,0);
        lcd.print("%");
        lcd.setCursor(7,0);
@@ -118,11 +104,12 @@ void loop(){
        lcd.setCursor(0,1);
        lcd.print(" Time: ");
        lcd.print(rtc.getTimeStr());
-   // sensor();
+       // sensor();
       if (buttonS==HIGH)
       {        
         Setup = 1;       
       }
+      delay(100);
 }
 while(Setup==1)
    {    
@@ -151,12 +138,12 @@ int proOut=0;
     lcd.setCursor(3,1);
     if (SecREC < 100) lcd.print(" ");
     lcd.print(SecREC);
+    if (SecREC < 15) lcd.print("  0");
     lcd.setCursor(6,1);
     lcd.print("  m/REC");   
       if(buttonU==HIGH)
       {
-        delay(200);
-        THour ++;
+           THour ++;
            if(THour>=4)
            {
            THour=4;
@@ -165,8 +152,7 @@ int proOut=0;
       }
       if(buttonD==HIGH)
       {
-        delay(200);
-        THour --;
+            THour --;
             if(THour<=0)
             {
             THour=0;
@@ -185,24 +171,22 @@ int proOut=0;
       }
       if(buttonL==HIGH)
       {
-            for (int i = 0; i <= 3; i++)
-            {  
+    
+              writeSD();
               lcd.clear();
-              delay(100);
+              delay(200);
               lcd.setCursor(3,0);
               lcd.print("Start  REC");
               delay(1000);
-            }
-            Start = sumtime;
+              Start = sumtime;
         Serial.println("Save Now!!");
-        writeSD();
         delay(200);
         REC();
         proOut++;
         //Do It ( Start REC )
         
       }
-      
+      delay(100);     
   }
 }
 
@@ -213,6 +197,7 @@ void REC()
   t = rtc.getTime();
   realmin = t.sec;
   realminSD=1;
+  th.Read();
         if(realmin<=60)
               {
                 sumtime = realmin + SecREC;
@@ -222,7 +207,7 @@ void REC()
               th.Read();
        lcd.setCursor(0,0);
        lcd.print("H:");
-       lcd.print(th.h);
+       lcd.print(th.h+10);
        lcd.setCursor(6,0);
        lcd.print("%");
        lcd.setCursor(7,0);
@@ -253,7 +238,23 @@ void REC()
               p++;
               Serial.println("Save Now!!");
               Start=sumtime;
-              writeSD();
+              //writeSD();
+              Serial.println("Memory!!!!");
+              myFile = SD.open("datalog.csv", FILE_WRITE);
+              if(myFile)
+              {
+                myFile.print(p);
+                myFile.print(",");
+                myFile.print(rtc.getTimeStr());
+                myFile.print(",");
+                myFile.print(rtc.getDateStr());
+                myFile.print(",");
+                myFile.print(th.h+10);
+                myFile.print(",");
+                myFile.println(th.t);
+                myFile.close();
+                
+              }
               }
               buttonR = digitalRead(buttonRight);
                if(buttonR==HIGH)
@@ -265,6 +266,7 @@ void REC()
                 delay(3000);
                 i++;                     
               }
+             delay(100);
      Setup=0; 
   }
 }
@@ -302,15 +304,31 @@ void checkSD()//Check SD Card
            Setup=0;   
            lcd.clear();
            delay(200);
+    myFile = SD.open("datalog.csv", FILE_WRITE);
+    if(myFile)
+    {
+      Serial.print("start lable");
+      myFile.print("Item");
+      myFile.print(",");
+      myFile.print("Time");
+      myFile.print(",");
+      myFile.print("Date");
+      myFile.print(",");
+      myFile.print("Humidity");
+      myFile.print(",");
+      myFile.println("Temperature ");
+      myFile.close();
+      
+    }
 }
 
 void writeSD()// เขียนค่าลง SD การ์ด
 {
-  lcd.clear();
+  /*lcd.clear();
   delay(200);
   lcd.setCursor(1,0);
   lcd.print("REC To SD Card");
-  delay(1000);
+  delay(1000);*/
   Serial.println("Memory!!!!");
   myFile = SD.open("datalog.csv", FILE_WRITE);
   if(myFile)
@@ -321,9 +339,9 @@ void writeSD()// เขียนค่าลง SD การ์ด
     myFile.print(",");
     myFile.print(rtc.getDateStr());
     myFile.print(",");
-    myFile.println(th.t);
+    myFile.print(th.h+10);
     myFile.print(",");
-    myFile.println(th.h);
+    myFile.println(th.t);
     myFile.close();
     
   }
